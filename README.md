@@ -1,11 +1,51 @@
-# BEE Plugin client side code sample
-Use this sample to understand how a BEE Plugin integration works.
 
-1. Create an account at developers.beefree.io (a free one is available)
-2. Open index.html and change the placeholders YOUR_CLIENT_ID and YOUR_CLIENT_SECRET with your credentials
-3. Run it in your browser
+![BEEPlugin](http://beedemos.com/Content/logo.png)
 
--------------------------
+**Live Demo**: https://beefree.io/templates/
 
-###### https://www.beefree.io
-###### [Getting started with BEE Plugin](http://help.beefree.io/hc/en-us/sections/201052881-Getting-started-with-BEE-Plugin)
+# Client-side Sample Code
+
+![](https://beefree.io/wp-content/themes/bee2017/img/beeplugin/hero.png)
+
+### Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Obtaining Credentials](#obtaining-credentials)
+- [Resources](#resources)
+
+### Prerequisites
+
+- [FREE Developer Account](https://developers.beefree.io/signup/plan/1)
+
+
+### Getting Started
+
+The easiest way to get started is to clone this repository:
+
+```bash
+# Get the latest snapshot 
+git clone https://github.com/BEE-Plugin/ClientSIde-code-sample.git myproject
+
+# Change directory
+cd myproject
+
+# Open index.html and change the placeholders YOUR_CLIENT_ID and YOUR_CLIENT_SECRET with your credentials
+&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET
+
+# Then simply run it in your browser
+index.html
+```
+
+
+### Obtaining Credentials
+
+To use BEE Plugin, you will need to obtain appropriate credentials: Client ID and Client Secret, which are available in the application details page of the BEE Plugin developer portal.
+
+https://developers.beefree.io/apps
+
+### Resources
+
+* [Technical Docs](https://docs.beefree.io/) 
+* [Developer Portal](https://developers.beefree.io/login) 
+* [FAQs](https://docs.beefree.io/faq/)
