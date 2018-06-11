@@ -62,6 +62,8 @@
       if (req.readyState === 4 && req.status === 200) {
         var response = JSON.parse(req.responseText);
         callback(response);
+      } else if (req.readyState === 4 && req.status !== 200) {
+        console.error('Access denied, invalid credentials. Please check you entered a valid client_id and client_secret.');
       }
     };
 
