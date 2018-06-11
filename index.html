@@ -57,7 +57,6 @@
 
   var request = function (method, url, data, type, callback) {
     var req = new XMLHttpRequest();
-    console.log(type);
     req.onreadystatechange = function () {
       if (req.readyState === 4 && req.status === 200) {
         var response = JSON.parse(req.responseText);
