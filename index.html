@@ -130,6 +130,7 @@
     container: 'bee-plugin-container',
     autosave: 15,
     language: 'en-US',
+    trackChanges: true,
     specialLinks: specialLinks,
     mergeTags: mergeTags,
     mergeContents: mergeContents,
@@ -166,6 +167,10 @@
           after: '{endif}'
         })
       },
+    },
+    onChange: function (jsonFile, response) {
+      console.log('json', jsonFile);
+      console.log('response', response);
     },
     onSave: function (jsonFile, htmlFile) {
       save('newsletter.html', htmlFile);
