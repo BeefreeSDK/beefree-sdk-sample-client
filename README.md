@@ -1,5 +1,5 @@
 
-![BEEPlugin](http://beedemos.com/Content/logo.png)
+![BEEPlugin](https://avatars.githubusercontent.com/u/15609939?v=4)
 
 **Live Demo**: https://beefree.io/templates/
 
@@ -24,7 +24,7 @@
 The easiest way to get started is to clone this repository:
 
 ```bash
-# Get the latest snapshot 
+# Get the latest snapshot
 git clone https://github.com/BEE-Plugin/ClientSIde-code-sample.git myproject
 
 # Change directory
@@ -46,6 +46,6 @@ https://developers.beefree.io/apps
 
 ### Resources
 
-* [Technical Docs](https://docs.beefree.io/) 
-* [Developer Portal](https://developers.beefree.io/login) 
+* [Technical Docs](https://docs.beefree.io/)
+* [Developer Portal](https://developers.beefree.io/login)
 * [FAQs](https://docs.beefree.io/faq/)
