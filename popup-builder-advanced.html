@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>BEE Plugin - Popup Builder - Integration Example</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style type="text/css">
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    body {
+      overflow: hidden;
+      background-color: #CCCCCC;
+      color: #000000;
+    }
+
+    #bee-plugin-container {
+      position: absolute;
+      top: 5px;
+      bottom: 30px;
+      left: 5px;
+      right: 5px;
+    }
+
+    #integrator-bottom-bar {
+      position: absolute;
+      height: 25px;
+      bottom: 0px;
+      left: 5px;
+      right: 0px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="bee-plugin-container"></div>
+  <div id="integrator-bottom-bar">
+    <!-- You can change the download function to get the JSON and use this input to load it -->
+    Select template to load:
+    <input id="choose-template" type="file" />
+    <!-- You need to provide a send function to use this input field -->
+    Send test e-mail to:
+    <input id="integrator-test-emails" type="text" />
+  </div>
+
+</body>
+
+<script src="Blob.js"></script>
+<script src="fileSaver.js"></script>
+<script src="https://app-rsrc.getbee.io/plugin/BeePlugin.js"></script>
+
+<script type="text/javascript">
+
+  var request = function (method, url, data, type, callback) {
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = function () {
+      if (req.readyState === 4 && req.status === 200) {
+        var response = JSON.parse(req.responseText);
+        callback(response);
+      } else if (req.readyState === 4 && req.status !== 200) {
+        console.error('Access denied, invalid credentials. Please check you entered a valid client_id and client_secret.');
+      }
+    };
+
+    req.open(method, url, true);
+    if (data && type) {
+      if (type === 'multipart/form-data') {
+        var formData = new FormData();
+        for (var key in data) {
+          formData.append(key, data[key]);
+        }
+        data = formData;
+      }
+      else {
+        req.setRequestHeader('Content-type', type);
+      }
+    }
+
+    req.send(data);
+  };
+
+  var save = function (filename, content) {
+    saveAs(
+      new Blob([content], { type: 'text/plain;charset=utf-8' }),
+      filename
+    );
+  };
+
+  var specialLinks = [{
+    type: 'unsubscribe',
+    label: 'SpecialLink.Unsubscribe',
+    link: 'http://[unsubscribe]/'
+  }, {
+    type: 'subscribe',
+    label: 'SpecialLink.Subscribe',
+    link: 'http://[subscribe]/'
+  }];
+
+  var mergeTags = [{
+    name: 'tag 1',
+    value: '[tag1]'
+  }, {
+    name: 'tag 2',
+    value: '[tag2]'
+  }];
+
+  var mergeContents = [{
+    name: 'content 1',
+    value: '[content1]'
+  }, {
+    name: 'content 2',
+    value: '[content1]'
+  }];
+
+  function userInput(message, sample) {
+    return function handler(resolve, reject) {
+      var data = prompt(message, JSON.stringify(sample))
+      return (data == null || data == '')
+        ? reject()
+        : resolve(JSON.parse(data))
+    }
+  }
+
+  var beeConfig = {
+    uid: 'test1-clientside',
+    container: 'bee-plugin-container',
+    autosave: 15,
+    language: 'en-US',
+    trackChanges: true,
+    specialLinks: specialLinks,
+    mergeTags: mergeTags,
+    mergeContents: mergeContents,
+    workspace: {
+      popup: {
+        backgroundImage: 'https://picsum.photos/200',
+        backgroundImageMobile: 'https://picsum.photos/200',
+        customLayout: {
+          wrapper: {
+            margin: '0',
+            marginTop: 'auto',
+          },
+        },
+        customStyles: {
+          overlay: {
+            background: 'rgba(192,192,192,.75)',
+          },
+          container: {
+            backgroundColor: 'white',
+            backgroundClip: 'padding-box',
+            borderRadius: '8px',
+            outline: '0',
+            boxShadow: '0 0 10px #000',
+            padding: '30px',
+            width: '100%',
+            maxWidth: '100%',
+            margin: '0',
+          },
+          content: {
+            display: 'inline',
+          },
+          header: {
+            position: 'relative',
+            right: {
+              top: '-42px',
+              right: '-42px',
+              position: 'absolute',
+              width: '30px',
+              height: '30px',
+              textIndent: '-9999px',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center center',
+              backgroundImage: 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAAAXNSR0IArs4c6QAAA3hJREFUaAXlm8+K00Acx7MiCIJH/yw+gA9g25O49SL4AO3Bp1jw5NvktC+wF88qevK4BU97EmzxUBCEolK/n5gp3W6TTJPfpNPNF37MNsl85/vN/DaTmU6PknC4K+pniqeKJ3k8UnkvDxXJzzy+q/yaxxeVHxW/FNHjgRSeKt4rFoplzaAuHHDBGR2eS9G54reirsmienDCTRt7xwsp+KAoEmt9nLaGitZxrBbPFNaGfPloGw2t4JVamSt8xYW6Dg1oCYo3Yv+rCGViV160oMkcd8SYKnYV1Nb1aEOjCe6L5ZOiLfF120EjWhuBu3YIZt1NQmujnk5F4MgOpURzLfAwOBSTmzp3fpDxuI/pabxpqOoz2r2HLAb0GMbZKlNV5/Hg9XJypguryA7lPF5KMdTZQzHjqxNPhWhzIuAruOl1eNqKEx1tSh5rfbxdw7mOxCq4qS68ZTjKS1YVvilu559vWvFHhh4rZrdyZ69Vmpgdj8fJbDZLJpNJ0uv1cnr/gjrUhQMuI+ANjyuwftQ0bbL6Erp0mM/ny8Fg4M3LtdRxgMtKl3jwmIHVxYXChFy94/Rmpa/pTbNUhstKV+4Rr8lLQ9KlUvJKLyG8yvQ2s9SBy1Jb7jV5a0yapfF6apaZLjLLcWtd4sNrmJUMHyM+1xibTjH82Zh01TNlhsrOhdKTe00uAzZQmN6+KW+sDa/JD2PSVQ873m29yf+1Q9VDzfEYlHi1G5LKBBWZbtEsHbFwb1oYDwr1ZiF/2bnCSg1OBE/pfr9/bWx26UxJL3ONPISOLKUvQza0LZUxSKyjpdTGa/vDEr25rddbMM0Q3O6Lx3rqFvU+x6UrRKQY7tyrZecmD9FODy8uLizTmilwNj0kraNcAJhOp5aGVwsAGD5VmJBrWWbJSgWT9zrzWepQF47RaGSiKfeGx6Szi3gzmX/HHbihwBser4B9UJYpFBNX4R6vTn3VQnez0SymnrHQMsRYGTr1dSk34ljRqS/EMd2pLQ8YBp3a1PLfcqCpo8gtHkZFHKkTX6fs3MY0blKnth66rKCnU0VRGu37ONrQaA4eZDFtWAu2fXj9zjFkxTBOo8F7t926gTp/83Kyzzcy2kZD6xiqxTYnHLRFm3vHiRSwNSjkz3hoIzo8lCKWUlg/YtGs7tObunDAZfpDLbfEI15zsEIY3U/x/gHHc/G1zltnAgAAAABJRU5ErkJggg==)',
+            },
+          },
+        }
+      }
+    },
+    contentDialog: {
+      specialLinks: {
+        label: 'Add a custom Special Link',
+        handler: userInput('Enter the deep link:', {
+          type: 'custom',
+          label: 'external special link',
+          link: 'http://www.example.com'
+        })
+      },
+      mergeTags: {
+        label: 'Add custom tag 2',
+        handler: userInput('Enter the merge tag:', {
+          name: 'name',
+          value: '[name]'
+        })
+      },
+      mergeContents: {
+        label: 'Choose a custom merge content',
+        handler: userInput('Enter the merge content:', {
+          name: 'my custom content',
+          value: '{my-custom-content}'
+        })
+      },
+      rowDisplayConditions: {
+        label: 'Open builder',
+        handler: userInput('Enter the row display condition:', {
+          type: 'People',
+          label: 'Person is a developer',
+          description: 'Check if a person is a developer',
+          before: "{if job == 'developer'}",
+          after: '{endif}'
+        })
+      },
+    },
+    onChange: function (jsonFile, response) {
+      console.log('json', jsonFile);
+      console.log('response', response);
+    },
+    onSave: function (jsonFile, htmlFile) {
+      save('newsletter.html', htmlFile);
+    },
+    onSaveAsTemplate: function (jsonFile) { // + thumbnail?
+      save('newsletter-template.json', jsonFile);
+    },
+    onAutoSave: function (jsonFile) { // + thumbnail?
+      console.log(new Date().toISOString() + ' autosaving...');
+      window.localStorage.setItem('newsletter.autosave', jsonFile);
+    },
+    onSend: function (htmlFile) {
+      //write your send test function here
+    },
+    onError: function (errorMessage) {
+      console.log('onError ', errorMessage);
+    }
+  };
+
+  var bee = null;
+
+  var loadTemplate = function (e) {
+    var templateFile = e.target.files[0];
+    var reader = new FileReader();
+
+    reader.onload = function () {
+      var templateString = reader.result;
+      var template = JSON.parse(templateString);
+      bee.load(template);
+    };
+
+    reader.readAsText(templateFile);
+  };
+
+  document.getElementById('choose-template').addEventListener('change', loadTemplate, false);
+
+  var template = {"page":{"body":{"container":{"style":{"background-color":"#e2dede"}},"content":{"computedStyle":{"linkColor":"#FF819C","messageBackgroundColor":"transparent","messageWidth":"400px","messageWidthMobile":"250px"},"style":{"color":"#000000","font-family":"'Montserrat', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif"}},"type":"mailup-bee-page-properties","webFonts":[{"fontFamily":"'Montserrat', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif","name":"Montserrat","url":"https://fonts.googleapis.com/css?family=Montserrat"},{"family":"'Helvetica Neue', Helvetica, Arial, sans-serif","fontFamily":"'Helvetica Neue', Helvetica, Arial, sans-serif","fontName":"Helvetica","name":"Helvetica"},{"family":"'Lato', Tahoma, Verdana, Segoe, sans-serif","fontFamily":"'Lato', Tahoma, Verdana, Segoe, sans-serif","fontName":"Lato","name":"Lato","url":"https://fonts.googleapis.com/css?family=Lato"},{"family":"'Roboto', Tahoma, Verdana, Segoe, sans-serif","fontFamily":"'Roboto', Tahoma, Verdana, Segoe, sans-serif","fontName":"Roboto","name":"Roboto","url":"https://fonts.googleapis.com/css?family=Roboto"},{"family":"'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif","fontFamily":"'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif","fontName":"Open Sans","name":"Open Sans","url":"https://fonts.googleapis.com/css?family=Open+Sans"},{"family":"Verdana, Geneva, sans-serif","fontFamily":"Verdana, Geneva, sans-serif","fontName":"Verdana","name":"Verdana"},{"family":"Tahoma, Verdana, Segoe, sans-serif","fontFamily":"Tahoma, Verdana, Segoe, sans-serif","fontName":"Tahoma","name":"Tahoma"},{"family":"ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, sans-serif","fontFamily":"ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, sans-serif","fontName":"ヒラギノ角ゴ Pro W3","name":"ヒラギノ角ゴ Pro W3"},{"fontFamily":"'Akaya Telivigala', arial","name":"Akaya Telivigala","url":"https://fonts.googleapis.com/css?family=Akaya+Telivigala"},{"family":"'Droid Serif', Georgia, Times, 'Times New Roman', serif","fontFamily":"'Droid Serif', Georgia, Times, 'Times New Roman', serif","fontName":"Droid Serif","name":"Droid Serif","url":"https://fonts.googleapis.com/css?family=Droid+Serif"}]},"description":"BF-ecommerce-template","rows":[{"container":{"style":{"background-color":"transparent","background-image":"none","background-repeat":"no-repeat","background-position":"top left"}},"content":{"style":{"background-color":"transparent","color":"#000000","width":"800px","background-image":"none","background-repeat":"no-repeat","background-position":"top left"},"computedStyle":{"rowColStackOnMobile":true,"rowReverseColStackOnMobile":false}},"columns":[{"style":{"background-color":"transparent","border-bottom":"0px solid transparent","border-left":"0px solid transparent","border-right":"0px solid transparent","border-top":"0px solid transparent","padding-bottom":"0px","padding-left":"0px","padding-right":"0px","padding-top":"0px"},"modules":[{"type":"mailup-bee-newsletter-modules-image","descriptor":{"image":{"alt":"","src":"https://d1oco4z2z1fhwp.cloudfront.net/templates/default/4126/album_1.jpg","href":"","width":"1743px","height":"1744px"},"style":{"width":"100%","padding-top":"0px","padding-right":"0px","padding-bottom":"0px","padding-left":"0px"},"computedStyle":{"class":"center autowidth","width":"200px","hideContentOnMobile":false}},"uuid":"50faff8e-b6a0-4332-b086-3f3bde8adb38"}],"grid-columns":6,"uuid":"d52c7d26-cf12-4d93-a251-290c9b4ac4be"},{"style":{"background-color":"transparent","border-bottom":"0px solid transparent","border-left":"0px solid transparent","border-right":"0px solid transparent","border-top":"0px solid transparent","padding-bottom":"0px","padding-left":"0px","padding-right":"0px","padding-top":"0px"},"modules":[{"type":"mailup-bee-newsletter-modules-heading","descriptor":{"heading":{"title":"h3","text":"<strong>NEW RELEASE</strong>","style":{"color":"#aaaaaa","font-size":"10px","font-family":"'Montserrat', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif","link-color":"#fefefe","line-height":"120%","text-align":"left","direction":"ltr","font-weight":"normal","letter-spacing":"0px"}},"style":{"width":"100%","text-align":"center","padding-top":"5px","padding-right":"10px","padding-bottom":"0px","padding-left":"10px"},"computedStyle":{"width":52,"height":42}},"uuid":"a07fa982-5167-456d-b9d6-866cb3b21b04"},{"type":"mailup-bee-newsletter-modules-divider","descriptor":{"divider":{"style":{"border-top":"1px solid #AAAAAA","width":"100%"}},"style":{"padding-top":"0px","padding-right":"10px","padding-bottom":"5px","padding-left":"10px"},"computedStyle":{"align":"center","hideContentOnMobile":false}},"uuid":"124a0f88-e13c-482f-a22e-2951e24b2cc8"},{"type":"mailup-bee-newsletter-modules-icons","descriptor":{"iconsList":{"icons":[{"image":"https://d1oco4z2z1fhwp.cloudfront.net/templates/default/4126/play-round.png","textPosition":"right","text":"Random Times","alt":"","title":"","href":"","target":"_self","width":"256px","height":"256px"},{"image":"https://d1oco4z2z1fhwp.cloudfront.net/templates/default/4126/play-round.png","textPosition":"right","text":"Handmade Justice","alt":"","title":"","href":"","target":"_self","width":"256px","height":"256px"},{"image":"https://d1oco4z2z1fhwp.cloudfront.net/templates/default/4126/play-round.png","textPosition":"right","text":"Bad Choices","alt":"","title":"","href":"","target":"_self","width":"256px","height":"256px"}]},"style":{"color":"#ffffff","text-align":"left","padding-top":"0px","padding-right":"5px","padding-bottom":"0px","padding-left":"5px","font-family":"inherit","font-size":"11px"},"computedStyle":{"hideContentOnMobile":false,"hideContentOnDesktop":false,"itemSpacing":"0px","iconSpacing":{"padding-top":"5px","padding-right":"5px","padding-bottom":"5px","padding-left":"5px"},"iconHeight":"16px"}},"uuid":"aa7e1acd-b042-40a1-95f8-57c527929f02"},{"type":"mailup-bee-newsletter-modules-divider","descriptor":{"divider":{"style":{"border-top":"1px solid #AAAAAA","width":"100%"}},"style":{"padding-top":"5px","padding-right":"10px","padding-bottom":"0px","padding-left":"10px"},"computedStyle":{"align":"center","hideContentOnMobile":false}},"uuid":"f2581fb1-33f2-4ab1-b912-62c9d9d3ef90"},{"type":"mailup-bee-newsletter-modules-icons","descriptor":{"iconsList":{"icons":[{"image":"https://d1oco4z2z1fhwp.cloudfront.net/templates/default/4126/c3006d25-09a1-46c5-b6ba-f3ef32039d5b.png","textPosition":"left","text":"AVAILABLE IN","alt":"","title":"","href":"","target":"_self","width":"122px","height":"112px"},{"image":"https://d1oco4z2z1fhwp.cloudfront.net/templates/default/4126/amazon.png","textPosition":"right","text":"","alt":"","title":"","href":"","target":"_self","width":"122px","height":"122px"},{"image":"https://d1oco4z2z1fhwp.cloudfront.net/templates/default/4126/apple.png","textPosition":"right","text":"","alt":"","title":"","href":"","target":"_self","width":"122px","height":"122px"}]},"style":{"color":"#aaaaaa","text-align":"left","padding-top":"0px","padding-right":"10px","padding-bottom":"0px","padding-left":"10px","font-family":"inherit","font-size":"10px","letter-spacing":"0px"},"computedStyle":{"hideContentOnMobile":false,"hideContentOnDesktop":false,"itemSpacing":"0px","iconSpacing":{"padding-top":"5px","padding-right":"0px","padding-bottom":"5px","padding-left":"5px"},"iconHeight":"16px","itemsSpacing":"0px"}},"uuid":"9e879112-7a55-418a-a6d6-67d482457600"},{"type":"mailup-bee-newsletter-modules-button","descriptor":{"button":{"label":"<div class=\"txtTinyMce-wrapper\" style=\"font-size: 12px; line-height: 24px;\" data-mce-style=\"font-size: 12px; line-height: 24px;\"><p style=\"font-size: 16px; line-height: 32px; word-break: break-word;\" data-mce-style=\"font-size: 16px; line-height: 32px;\"><span style=\"font-size: 12px; line-height: 24px;\" data-mce-style=\"font-size: 12px; line-height: 24px;\">Order Now →</span></p></div>","href":"","style":{"font-family":"inherit","background-color":"#af0022","border-radius":"4px","border-top":"0px solid transparent","border-right":"0px solid transparent","border-bottom":"0px solid transparent","border-left":"0px solid transparent","color":"#ffffff","line-height":"200%","padding-top":"5px","padding-right":"20px","padding-bottom":"5px","padding-left":"20px","width":"auto","max-width":"100%"}},"style":{"text-align":"center","padding-top":"10px","padding-right":"10px","padding-bottom":"10px","padding-left":"10px"},"computedStyle":{"width":120,"height":42,"hideContentOnMobile":false}},"uuid":"6ee7edbb-dbe7-4f14-8f5b-a52c26b8e842"}],"grid-columns":6,"uuid":"de8928e6-8edf-4a12-b4a6-bfd8e8f155db"}],"type":"two-columns-empty","uuid":"d271fd20-3c23-488c-8d10-1bad582cd503"}],"template":{"name":"template-base","type":"basic","version":"2.0.0"},"title":"BF-ecommerce-template"},"comments":{}}
+
+  request(
+    'POST',
+    'https://auth.getbee.io/apiauth',
+    'grant_type=password&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET',
+    'application/x-www-form-urlencoded',
+    function (token) {
+      BeePlugin.create(token, beeConfig, function (beePluginInstance) {
+        bee = beePluginInstance;
+        bee.start(template);
+      });
+    });
+
+</script>
+
+</html>
