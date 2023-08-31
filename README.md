@@ -48,7 +48,7 @@ The easiest way to get started is to clone this repository:
 
 # Get the latest snapshot
 
-git clone https://github.com/BEE-Plugin/ClientSIde-code-sample.git myproject
+git clone https://github.com/BeefreeSDK/ClientSIde-code-sample.git myproject
 
 
 
@@ -64,7 +64,7 @@ cd myproject
 
 
 
-# Then simply run it in your browser e.g.
+# Then run it in your browser, e.g.
 
 email-builder-simple.html
 
@@ -77,7 +77,7 @@ email-builder-simple.html
 
 
 
-To use BEE Plugin, you will need to obtain appropriate credentials: Client ID and Client Secret, which are available in the application details page of the BEE Plugin developer portal.
+To use Beefree SDK, you must obtain the appropriate credentials: Client ID and Client Secret, available on the Beefree SDK Developer Console application details page.
 
 
 
