@@ -60,13 +60,14 @@ cd myproject
 
 # Open index.html and change the placeholders YOUR_CLIENT_ID and YOUR_CLIENT_SECRET with your credentials
 
-&client_id=YOUR_CLIENT_ID&client_secret=YOUR_CLIENT_SECRET
+          client_id: "YOUR_CLIENT_ID",
+          client_secret: "YOUR_CLIENT_SECRET",
 
 
 
 # Then run it in your browser, e.g.
 
-email-builder-simple.html
+index.html
 
 ```
 
