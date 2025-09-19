@@ -33,7 +33,11 @@
 
 - [FREE Developer Account](https://developers.beefree.io/signup/plan/1)
 
-
+> **⚠️ Security Warning: For Demonstration Purposes Only**
+>
+> The authentication method used in this sample application is **for demonstration purposes only** and is **NOT secure for production environments.**
+>
+> This example exposes your `client_secret` in client-side code. For a secure production implementation, you **must** use a server-side proxy to protect your credentials. Please refer to our official documentation on [Server-side Authentication](https://docs.beefree.io/beefree-sdk/getting-started/readme/installation/authorization-process-in-detail) for the correct and secure method.
 
 
 ### Getting Started
